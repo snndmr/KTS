@@ -13,7 +13,7 @@
             android:layout_height="match_parent"
             android:contentDescription="@string/cardImage"
             android:scaleType="centerCrop"
-            android:src="@drawable/main"
+            android:src="@drawable/event"
             android:tint="@color/transparency" />
 
         <TextView
