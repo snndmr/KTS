@@ -10,4 +10,7 @@
     <string name="date">01/01/1970</string>
     <string name="time">12:00</string>
     <string name="add">EKLE</string>
+    <string name="eventTest">Event Test</string>
+    <string name="location">Ayvalı Mah. Gazze Cad. No: 7 Etlik-Keçiören / Ankara</string>
+    <string name="description">Oryantasyon</string>
 </resources>

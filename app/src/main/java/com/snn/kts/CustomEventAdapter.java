@@ -1,6 +1,7 @@
 package com.snn.kts;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,9 +11,11 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 class CustomEventAdapter extends RecyclerView.Adapter<CustomEventAdapter.Holder> {
+    private Context context;
     private LayoutInflater layoutInflater;
 
     CustomEventAdapter(Context context) {
+        this.context = context;
         this.layoutInflater = LayoutInflater.from(context);
     }
 
@@ -32,13 +35,21 @@ class CustomEventAdapter extends RecyclerView.Adapter<CustomEventAdapter.Holder>
         return MainActivity.events.size();
     }
 
-    static class Holder extends RecyclerView.ViewHolder {
+    class Holder extends RecyclerView.ViewHolder {
         private int position;
         private TextView cardTitle;
 
         Holder(@NonNull View itemView) {
             super(itemView);
 
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(context, EventActivity.class);
+                    intent.putExtra("Position", position);
+                    context.startActivity(intent);
+                }
+            });
             cardTitle = itemView.findViewById(R.id.cardTitle);
         }
 
