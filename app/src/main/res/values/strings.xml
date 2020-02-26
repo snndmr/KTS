@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">KTS</string>
+    <string name="main_image">main_image</string>
+    <string name="search_something">Etkinlikler, Kişiler veya Kayıtlar</string>
+    <string name="cardImage">card image</string>
+    <string name="enterEventName">Etkinlik Adı</string>
+    <string name="enterEventDescription">Etkinlik Tanımı</string>
+    <string name="enterEventLocation">Etkinlik Lokasyonu</string>
+    <string name="start">Tarih : </string>
+    <string name="date">01/01/1970</string>
+    <string name="time">12:00</string>
+    <string name="add">EKLE</string>
+</resources>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardElevation="@dimen/elevation8"
+    tools:context=".MainActivity"
+    tools:showIn="@layout/activity_main">
+
+    <EditText
+        android:id="@+id/etSearchBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@null"
+        android:cursorVisible="false"
+        android:drawableStart="@drawable/search"
+        android:drawablePadding="@dimen/padding12"
+        android:fontFamily="@font/tokens_normal"
+        android:hint="@string/search_something"
+        android:importantForAutofill="no"
+        android:inputType="text"
+        android:padding="@dimen/padding12"
+        android:textColorHint="@color/colorPrimaryDark"
+        android:textSize="@dimen/text16" />
+</androidx.cardview.widget.CardView>
