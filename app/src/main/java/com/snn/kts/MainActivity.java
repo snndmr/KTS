@@ -100,6 +100,18 @@ public class MainActivity extends AppCompatActivity {
         RecyclerView rvEvents = findViewById(R.id.rvEvents);
         customEventAdapter = new CustomEventAdapter(MainActivity.this);
 
+        rvEvents.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                if (dy > 0 && fabAddEvent.getVisibility() == View.VISIBLE) {
+                    fabAddEvent.hide();
+                } else if (dy < 0 && fabAddEvent.getVisibility() != View.VISIBLE) {
+                    fabAddEvent.show();
+                }
+            }
+        });
+
         rvEvents.setAdapter(customEventAdapter);
         rvEvents.setLayoutManager(new GridLayoutManager(MainActivity.this, 2));
 
@@ -110,6 +122,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 appBar.setExpanded(false);
+                if (fabAddEvent.getVisibility() != View.VISIBLE)
+                    fabAddEvent.show();
             }
         });
         etSearchBar.addTextChangedListener(new TextWatcher() {
@@ -132,6 +146,9 @@ public class MainActivity extends AppCompatActivity {
                     public void onCancelled(@NonNull DatabaseError databaseError) {
                     }
                 });
+
+                if (fabAddEvent.getVisibility() != View.VISIBLE)
+                    fabAddEvent.show();
             }
 
             @Override

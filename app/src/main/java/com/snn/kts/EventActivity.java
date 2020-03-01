@@ -9,6 +9,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -31,7 +32,8 @@ public class EventActivity extends AppCompatActivity {
         setContentView(R.layout.activity_event);
 
         position = getIntent().getIntExtra("Position", 0);
-        participants.addAll(MainActivity.events.get(position).participants);
+        if (MainActivity.events.get(position).participants != null)
+            participants.addAll(MainActivity.events.get(position).participants);
         initComponents();
     }
 
@@ -42,11 +44,23 @@ public class EventActivity extends AppCompatActivity {
         rvParticipants.setAdapter(participantAdapter);
         rvParticipants.setLayoutManager(new LinearLayoutManager(EventActivity.this));
 
-        FloatingActionButton fabScan = findViewById(R.id.fabScan);
+        final FloatingActionButton fabScan = findViewById(R.id.fabScan);
         fabScan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 EventActivity.this.startActivity(new Intent(EventActivity.this, ScannerActivity.class));
+            }
+        });
+
+        rvParticipants.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                if (dy > 0 && fabScan.getVisibility() == View.VISIBLE) {
+                    fabScan.hide();
+                } else if (dy < 0 && fabScan.getVisibility() != View.VISIBLE) {
+                    fabScan.show();
+                }
             }
         });
 
@@ -69,6 +83,8 @@ public class EventActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 appBar.setExpanded(false);
+                if (fabScan.getVisibility() != View.VISIBLE)
+                    fabScan.show();
             }
         });
         etSearch.addTextChangedListener(new TextWatcher() {
@@ -80,16 +96,23 @@ public class EventActivity extends AppCompatActivity {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 participants.clear();
-                for (Participant participant : MainActivity.events.get(position).participants) {
-                    if (participant.name.startsWith(String.valueOf(s))) {
-                        participants.add(participant);
+                if (MainActivity.events.get(position).participants != null) {
+                    for (Participant participant : MainActivity.events.get(position).participants) {
+                        if (participant.name.startsWith(String.valueOf(s))) {
+                            participants.add(participant);
+                        }
                     }
-                }
-                if (participants.size() == 0) {
+                    if (participants.size() == 0) {
+                        showToast(s + " bulunamadı!");
+                        participants.addAll(MainActivity.events.get(position).participants);
+                    }
+                    participantAdapter.notifyDataSetChanged();
+                } else {
                     showToast(s + " bulunamadı!");
-                    participants.addAll(MainActivity.events.get(position).participants);
                 }
-                participantAdapter.notifyDataSetChanged();
+
+                if (fabScan.getVisibility() != View.VISIBLE)
+                    fabScan.show();
             }
 
             @Override

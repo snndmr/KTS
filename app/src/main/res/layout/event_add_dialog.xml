@@ -102,10 +102,12 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight=".25"
+                android:background="@color/transparency"
                 android:fontFamily="@font/tokens_bold"
                 android:padding="@dimen/padding8"
                 android:text="@string/add"
                 android:textAlignment="center"
+                android:textColor="@android:color/white"
                 android:textSize="@dimen/text16" />
 
             <View
