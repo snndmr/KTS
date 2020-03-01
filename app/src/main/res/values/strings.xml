@@ -1,7 +1,8 @@
 <resources>
     <string name="app_name">KTS</string>
+    <string name="app_full_name">Kayıt Takip Sistemi</string>
     <string name="main_image">main_image</string>
-    <string name="search_something">Etkinlikler, Kişiler veya Kayıtlar</string>
+    <string name="search_something">Hadi bir şeyler ara</string>
     <string name="cardImage">card image</string>
     <string name="enterEventName">Etkinlik Adı</string>
     <string name="enterEventDescription">Etkinlik Tanımı</string>

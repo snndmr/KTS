@@ -4,6 +4,8 @@ import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.DatePicker;
@@ -18,11 +20,13 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.facebook.shimmer.ShimmerFrameLayout;
+import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
@@ -33,9 +37,42 @@ public class MainActivity extends AppCompatActivity {
     static ArrayList<Event> events = new ArrayList<>();
 
     private FloatingActionButton fabAddEvent;
-    private DatabaseReference databaseReference;
     private CustomEventAdapter customEventAdapter;
     private ShimmerFrameLayout shimmerFrameLayout;
+    private DatabaseReference databaseEventReference;
+
+    /*private void createTestVal() {
+        for (int i = 0; i < 10; i++) {
+            ArrayList<Participant> participants = new ArrayList<>();
+            for (int j = 0; j < 20; j++) {
+                participants.add(new Participant(
+                        String.valueOf(System.currentTimeMillis()) + j,
+                        "participant " + j + " : " + i,
+                        "participant " + j + " : " + i + "@ybu.edu.tr",
+                        "555 " + i + "23" + j + "4 " + i));
+            }
+
+            for (int j = 0; j < 30; j++) {
+                participants.add(new Student(
+                        String.valueOf(System.currentTimeMillis()) + j,
+                        "student " + j + " : " + i,
+                        "student " + j + " : " + i + "@ybu.edu.tr",
+                        "555 " + i + "23" + j + "4 " + i,
+                        "Computer Engineering" + j,
+                        "555 " + i + "23" + j + "4 " + i));
+            }
+
+            Event event = new Event(
+                    String.valueOf(System.currentTimeMillis()) + i,
+                    "event " + i,
+                    i % 31 + "/" + i % 12 + "/2020",
+                    i % 24 + ":" + i,
+                    "Ayvalı, Gazze Cd. No:7, 06010 Keçiören/Ankara",
+                    "Kariyer Günleri " + i,
+                    participants);
+            createEvent(event);
+        }
+    }*/
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,10 +80,15 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         initComponents();
+        //createTestVal();
         readEvents();
     }
 
     private void initComponents() {
+        databaseEventReference = FirebaseDatabase.getInstance().getReference("events");
+
+        final AppBarLayout appBar = findViewById(R.id.app_bar);
+
         fabAddEvent = findViewById(R.id.fabAddEvent);
         fabAddEvent.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -62,18 +104,57 @@ public class MainActivity extends AppCompatActivity {
         rvEvents.setLayoutManager(new GridLayoutManager(MainActivity.this, 2));
 
         shimmerFrameLayout = findViewById(R.id.shimmer_view_container);
+
+        EditText etSearchBar = findViewById(R.id.etSearchBar);
+        etSearchBar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                appBar.setExpanded(false);
+            }
+        });
+        etSearchBar.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void onTextChanged(final CharSequence s, int start, int before, int count) {
+                Query firebaseSearchQuery = databaseEventReference.orderByChild("name").startAt(String.valueOf(s))
+                        .endAt(s + "uf8ff");
+
+                firebaseSearchQuery.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        events.clear();
+                        for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                            MainActivity.events.add(0, ds.getValue(Event.class));
+                        }
+                        customEventAdapter.notifyDataSetChanged();
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                    }
+                });
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
+    }
+
+    private void createEvent(Event event) {
+        databaseEventReference.child(String.valueOf(event.id)).setValue(event);
     }
 
     private void readEvents() {
-        databaseReference = FirebaseDatabase.getInstance().getReference();
-        databaseReference.addValueEventListener(new ValueEventListener() {
+        databaseEventReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 events.clear();
                 for (DataSnapshot children : dataSnapshot.getChildren()) {
-                    for (DataSnapshot child : children.getChildren()) {
-                        MainActivity.events.add(0, child.getValue(Event.class));
-                    }
+                    MainActivity.events.add(0, children.getValue(Event.class));
                 }
                 customEventAdapter.notifyDataSetChanged();
 
@@ -90,10 +171,6 @@ public class MainActivity extends AppCompatActivity {
                 Log.e("DatabaseError", "loadPost:onCancelled", databaseError.toException());
             }
         });
-    }
-
-    private void createEvent(Event event) {
-        databaseReference.child("events").child(String.valueOf(event.id)).setValue(event);
     }
 
     private void showDialog() {
@@ -165,7 +242,8 @@ public class MainActivity extends AppCompatActivity {
                             tvDate.getText().toString(),
                             tvTime.getText().toString(),
                             etEventLocation.getText().toString(),
-                            etEventDescription.getText().toString()));
+                            etEventDescription.getText().toString(),
+                            new ArrayList<Participant>()));
                     dialog.dismiss();
                 } else {
                     Toast.makeText(MainActivity.this, "Etkinlik adını girin", Toast.LENGTH_SHORT).show();
