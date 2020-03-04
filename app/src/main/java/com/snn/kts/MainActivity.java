@@ -26,17 +26,17 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.concurrent.ThreadLocalRandom;
 
 public class MainActivity extends AppCompatActivity {
 
     static ArrayList<Event> events = new ArrayList<>();
+    static ArrayList<Event> temp = new ArrayList<>();
 
+    private Toast toast;
     private FloatingActionButton fabAddEvent;
     private CustomEventAdapter customEventAdapter;
     private ShimmerFrameLayout shimmerFrameLayout;
@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
 
         initComponents();
         readEvents();
-        /*createTestValues();*/
+        /* createTestValues(); */
     }
 
     private void initComponents() {
@@ -122,23 +122,18 @@ public class MainActivity extends AppCompatActivity {
         etSearchBar.addTextChangedListener(new TextWatcher() {
             @Override
             public void onTextChanged(final CharSequence s, int start, int before, int count) {
-                Query firebaseSearchQuery = databaseEventReference.orderByChild("name").startAt(String.valueOf(s))
-                        .endAt(s + "uf8ff");
-
-                firebaseSearchQuery.addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        events.clear();
-                        for (DataSnapshot ds : dataSnapshot.getChildren()) {
-                            MainActivity.events.add(0, ds.getValue(Event.class));
-                        }
-                        customEventAdapter.notifyDataSetChanged();
+                temp.clear();
+                for (Event event : MainActivity.events) {
+                    if (event.name.startsWith(String.valueOf(s)) ||
+                            event.name.toLowerCase().startsWith(String.valueOf(s))) {
+                        temp.add(event);
                     }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-                    }
-                });
+                }
+                if (temp.size() == 0) {
+                    showToast(s + " bulunamadı!");
+                    temp.addAll(MainActivity.events);
+                }
+                customEventAdapter.notifyDataSetChanged();
 
                 if (fabAddEvent.getVisibility() != View.VISIBLE)
                     fabAddEvent.show();
@@ -154,6 +149,14 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private void showToast(String text) {
+        if (this.toast != null) {
+            this.toast.cancel();
+        }
+        this.toast = Toast.makeText(this, text, Toast.LENGTH_SHORT);
+        this.toast.show();
+    }
+
     private void createEvent(Event event) {
         databaseEventReference.child(String.valueOf(event.id)).setValue(event);
     }
@@ -166,6 +169,7 @@ public class MainActivity extends AppCompatActivity {
                 for (DataSnapshot children : dataSnapshot.getChildren()) {
                     MainActivity.events.add(0, children.getValue(Event.class));
                 }
+                temp = new ArrayList<>(MainActivity.events);
                 customEventAdapter.notifyDataSetChanged();
 
                 if (shimmerFrameLayout.getVisibility() != View.GONE) {

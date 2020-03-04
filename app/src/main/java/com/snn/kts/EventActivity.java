@@ -32,12 +32,12 @@ public class EventActivity extends AppCompatActivity {
         setContentView(R.layout.activity_event);
 
         position = getIntent().getIntExtra("Position", 0);
-        if (MainActivity.events.get(position).participants != null)
-            participants.addAll(MainActivity.events.get(position).participants);
         initComponents();
     }
 
     private void initComponents() {
+        participants.addAll(MainActivity.temp.get(position).participants);
+
         RecyclerView rvParticipants = findViewById(R.id.rvParticipant);
         participantAdapter = new CustomParticipantAdapter(EventActivity.this, participants);
 
@@ -69,7 +69,7 @@ public class EventActivity extends AppCompatActivity {
         TextView tvEventLocation = findViewById(R.id.tvEventLocation);
         TextView tvEventDescription = findViewById(R.id.tvEventDescription);
 
-        final Event event = MainActivity.events.get(position);
+        final Event event = MainActivity.temp.get(position);
 
         tvEventName.setText(event.name);
         tvEventDate.setText(event.date);
@@ -78,13 +78,12 @@ public class EventActivity extends AppCompatActivity {
 
         final AppBarLayout appBar = findViewById(R.id.app_bar);
 
+        /* Search Part */
         EditText etSearch = findViewById(R.id.etSearchBar);
         etSearch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 appBar.setExpanded(false);
-                if (fabScan.getVisibility() != View.VISIBLE)
-                    fabScan.show();
             }
         });
         etSearch.addTextChangedListener(new TextWatcher() {
@@ -101,26 +100,24 @@ public class EventActivity extends AppCompatActivity {
             @Override
             public void afterTextChanged(Editable s) {
                 participants.clear();
-                if (MainActivity.events.get(position).participants != null) {
-                    for (Participant participant : MainActivity.events.get(position).participants) {
-                        if (participant.name.startsWith(String.valueOf(s)) ||
-                                participant.name.toLowerCase().startsWith(String.valueOf(s))) {
-                            participants.add(participant);
-                        }
+
+                for (Participant participant : MainActivity.temp.get(position).participants) {
+                    if (participant.name.startsWith(String.valueOf(s)) ||
+                            participant.name.toLowerCase().startsWith(String.valueOf(s))) {
+                        participants.add(participant);
                     }
-                    if (participants.size() == 0) {
-                        showToast(s + " bulunamadı!");
-                        participants.addAll(MainActivity.events.get(position).participants);
-                    }
-                    participantAdapter.notifyDataSetChanged();
-                } else {
-                    showToast(s + " bulunamadı!");
                 }
+                if (participants.size() == 0) {
+                    showToast(s + " bulunamadı!");
+                    participants.addAll(MainActivity.temp.get(position).participants);
+                }
+                participantAdapter.notifyDataSetChanged();
 
                 if (fabScan.getVisibility() != View.VISIBLE)
                     fabScan.show();
             }
         });
+        /* End of Search Part */
     }
 
     private void showToast(String text) {

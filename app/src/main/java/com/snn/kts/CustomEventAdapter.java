@@ -2,6 +2,7 @@ package com.snn.kts;
 
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,7 +33,7 @@ class CustomEventAdapter extends RecyclerView.Adapter<CustomEventAdapter.Holder>
 
     @Override
     public int getItemCount() {
-        return MainActivity.events.size();
+        return MainActivity.temp.size();
     }
 
     class Holder extends RecyclerView.ViewHolder {
@@ -55,7 +56,7 @@ class CustomEventAdapter extends RecyclerView.Adapter<CustomEventAdapter.Holder>
 
         void setData(int position) {
             this.position = position;
-            cardTitle.setText(MainActivity.events.get(position).name);
+            cardTitle.setText(MainActivity.temp.get(position).name);
         }
     }
 }
