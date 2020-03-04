@@ -33,8 +33,8 @@ import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity {
 
-    static ArrayList<Event> events = new ArrayList<>();
-    static ArrayList<Event> temp = new ArrayList<>();
+    static ArrayList<Event> eventsConst = new ArrayList<>();
+    static ArrayList<Event> eventsTemp = new ArrayList<>();
 
     private Toast toast;
     private FloatingActionButton fabAddEvent;
@@ -122,16 +122,16 @@ public class MainActivity extends AppCompatActivity {
         etSearchBar.addTextChangedListener(new TextWatcher() {
             @Override
             public void onTextChanged(final CharSequence s, int start, int before, int count) {
-                temp.clear();
-                for (Event event : MainActivity.events) {
+                eventsTemp.clear();
+                for (Event event : MainActivity.eventsConst) {
                     if (event.name.startsWith(String.valueOf(s)) ||
                             event.name.toLowerCase().startsWith(String.valueOf(s))) {
-                        temp.add(event);
+                        eventsTemp.add(event);
                     }
                 }
-                if (temp.size() == 0) {
+                if (eventsTemp.size() == 0) {
                     showToast(s + " bulunamadı!");
-                    temp.addAll(MainActivity.events);
+                    eventsTemp.addAll(MainActivity.eventsConst);
                 }
                 customEventAdapter.notifyDataSetChanged();
 
@@ -165,11 +165,11 @@ public class MainActivity extends AppCompatActivity {
         databaseEventReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                events.clear();
+                eventsConst.clear();
                 for (DataSnapshot children : dataSnapshot.getChildren()) {
-                    MainActivity.events.add(0, children.getValue(Event.class));
+                    MainActivity.eventsConst.add(0, children.getValue(Event.class));
                 }
-                temp = new ArrayList<>(MainActivity.events);
+                eventsTemp = new ArrayList<>(MainActivity.eventsConst);
                 customEventAdapter.notifyDataSetChanged();
 
                 if (shimmerFrameLayout.getVisibility() != View.GONE) {

@@ -36,7 +36,7 @@ public class EventActivity extends AppCompatActivity {
     }
 
     private void initComponents() {
-        participants.addAll(MainActivity.temp.get(position).participants);
+        participants.addAll(MainActivity.eventsTemp.get(position).participants);
 
         RecyclerView rvParticipants = findViewById(R.id.rvParticipant);
         participantAdapter = new CustomParticipantAdapter(EventActivity.this, participants);
@@ -69,7 +69,7 @@ public class EventActivity extends AppCompatActivity {
         TextView tvEventLocation = findViewById(R.id.tvEventLocation);
         TextView tvEventDescription = findViewById(R.id.tvEventDescription);
 
-        final Event event = MainActivity.temp.get(position);
+        final Event event = MainActivity.eventsTemp.get(position);
 
         tvEventName.setText(event.name);
         tvEventDate.setText(event.date);
@@ -101,7 +101,7 @@ public class EventActivity extends AppCompatActivity {
             public void afterTextChanged(Editable s) {
                 participants.clear();
 
-                for (Participant participant : MainActivity.temp.get(position).participants) {
+                for (Participant participant : MainActivity.eventsTemp.get(position).participants) {
                     if (participant.name.startsWith(String.valueOf(s)) ||
                             participant.name.toLowerCase().startsWith(String.valueOf(s))) {
                         participants.add(participant);
@@ -109,7 +109,7 @@ public class EventActivity extends AppCompatActivity {
                 }
                 if (participants.size() == 0) {
                     showToast(s + " bulunamadı!");
-                    participants.addAll(MainActivity.temp.get(position).participants);
+                    participants.addAll(MainActivity.eventsTemp.get(position).participants);
                 }
                 participantAdapter.notifyDataSetChanged();
 
