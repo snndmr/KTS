@@ -33,12 +33,11 @@ import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity {
 
-    static ArrayList<Event> eventsConst = new ArrayList<>();
-    static ArrayList<Event> eventsTemp = new ArrayList<>();
+    static ArrayList<Event> events = new ArrayList<>();
 
     private Toast toast;
     private FloatingActionButton fabAddEvent;
-    private CustomEventAdapter customEventAdapter;
+    private EventAdapter eventAdapter;
     private ShimmerFrameLayout shimmerFrameLayout;
     private DatabaseReference databaseEventReference;
 
@@ -71,7 +70,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
         initComponents();
         readEvents();
         /* createTestValues(); */
@@ -91,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         RecyclerView rvEvents = findViewById(R.id.rvEvents);
-        customEventAdapter = new CustomEventAdapter(MainActivity.this);
+        eventAdapter = new EventAdapter(MainActivity.this);
 
         rvEvents.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -105,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        rvEvents.setAdapter(customEventAdapter);
+        rvEvents.setAdapter(eventAdapter);
         rvEvents.setLayoutManager(new GridLayoutManager(MainActivity.this, 2));
 
         shimmerFrameLayout = findViewById(R.id.shimmer_view_container);
@@ -115,25 +113,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 appBar.setExpanded(false);
-                if (fabAddEvent.getVisibility() != View.VISIBLE)
-                    fabAddEvent.show();
             }
         });
         etSearchBar.addTextChangedListener(new TextWatcher() {
             @Override
             public void onTextChanged(final CharSequence s, int start, int before, int count) {
-                eventsTemp.clear();
-                for (Event event : MainActivity.eventsConst) {
-                    if (event.name.startsWith(String.valueOf(s)) ||
-                            event.name.toLowerCase().startsWith(String.valueOf(s))) {
-                        eventsTemp.add(event);
-                    }
-                }
-                if (eventsTemp.size() == 0) {
-                    showToast(s + " bulunamadı!");
-                    eventsTemp.addAll(MainActivity.eventsConst);
-                }
-                customEventAdapter.notifyDataSetChanged();
+                eventAdapter.getFilter().filter(s);
 
                 if (fabAddEvent.getVisibility() != View.VISIBLE)
                     fabAddEvent.show();
@@ -149,14 +134,6 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void showToast(String text) {
-        if (this.toast != null) {
-            this.toast.cancel();
-        }
-        this.toast = Toast.makeText(this, text, Toast.LENGTH_SHORT);
-        this.toast.show();
-    }
-
     private void createEvent(Event event) {
         databaseEventReference.child(String.valueOf(event.id)).setValue(event);
     }
@@ -165,12 +142,10 @@ public class MainActivity extends AppCompatActivity {
         databaseEventReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                eventsConst.clear();
                 for (DataSnapshot children : dataSnapshot.getChildren()) {
-                    MainActivity.eventsConst.add(0, children.getValue(Event.class));
+                    events.add(0, children.getValue(Event.class));
                 }
-                eventsTemp = new ArrayList<>(MainActivity.eventsConst);
-                customEventAdapter.notifyDataSetChanged();
+                eventAdapter.notifyDataSetChanged();
 
                 if (shimmerFrameLayout.getVisibility() != View.GONE) {
                     shimmerFrameLayout.stopShimmer();
@@ -260,7 +235,7 @@ public class MainActivity extends AppCompatActivity {
                             new ArrayList<Participant>()));
                     dialog.dismiss();
                 } else {
-                    Toast.makeText(MainActivity.this, "Etkinlik adını girin", Toast.LENGTH_SHORT).show();
+                    mToast.showToast(MainActivity.this, "Etkinlik adını girin!");
                 }
             }
         });

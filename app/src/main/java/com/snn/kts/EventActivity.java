@@ -7,7 +7,6 @@ import android.text.TextWatcher;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -21,10 +20,9 @@ import java.util.ArrayList;
 
 public class EventActivity extends AppCompatActivity {
 
-    private Toast toast;
+    static ArrayList<Participant> participants = new ArrayList<>();
     private int position;
-    private CustomParticipantAdapter participantAdapter;
-    private ArrayList<Participant> participants = new ArrayList<>();
+    private ParticipantAdapter participantAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,10 +34,10 @@ public class EventActivity extends AppCompatActivity {
     }
 
     private void initComponents() {
-        participants.addAll(MainActivity.eventsTemp.get(position).participants);
+        participants.addAll(EventAdapter.events.get(position).participants);
 
         RecyclerView rvParticipants = findViewById(R.id.rvParticipant);
-        participantAdapter = new CustomParticipantAdapter(EventActivity.this, participants);
+        participantAdapter = new ParticipantAdapter(EventActivity.this);
 
         rvParticipants.setAdapter(participantAdapter);
         rvParticipants.setLayoutManager(new LinearLayoutManager(EventActivity.this));
@@ -69,7 +67,7 @@ public class EventActivity extends AppCompatActivity {
         TextView tvEventLocation = findViewById(R.id.tvEventLocation);
         TextView tvEventDescription = findViewById(R.id.tvEventDescription);
 
-        final Event event = MainActivity.eventsTemp.get(position);
+        final Event event = EventAdapter.events.get(position);
 
         tvEventName.setText(event.name);
         tvEventDate.setText(event.date);
@@ -94,37 +92,15 @@ public class EventActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-
+                participantAdapter.getFilter().filter(s);
+                if (fabScan.getVisibility() != View.VISIBLE)
+                    fabScan.show();
             }
 
             @Override
             public void afterTextChanged(Editable s) {
-                participants.clear();
-
-                for (Participant participant : MainActivity.eventsTemp.get(position).participants) {
-                    if (participant.name.startsWith(String.valueOf(s)) ||
-                            participant.name.toLowerCase().startsWith(String.valueOf(s))) {
-                        participants.add(participant);
-                    }
-                }
-                if (participants.size() == 0) {
-                    showToast(s + " bulunamadı!");
-                    participants.addAll(MainActivity.eventsTemp.get(position).participants);
-                }
-                participantAdapter.notifyDataSetChanged();
-
-                if (fabScan.getVisibility() != View.VISIBLE)
-                    fabScan.show();
             }
         });
         /* End of Search Part */
-    }
-
-    private void showToast(String text) {
-        if (this.toast != null) {
-            this.toast.cancel();
-        }
-        this.toast = Toast.makeText(this, text, Toast.LENGTH_SHORT);
-        this.toast.show();
     }
 }
