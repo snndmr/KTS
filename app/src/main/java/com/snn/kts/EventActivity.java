@@ -95,10 +95,16 @@ public class EventActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
                 participants.clear();
                 if (MainActivity.events.get(position).participants != null) {
                     for (Participant participant : MainActivity.events.get(position).participants) {
-                        if (participant.name.startsWith(String.valueOf(s))) {
+                        if (participant.name.startsWith(String.valueOf(s)) ||
+                                participant.name.toLowerCase().startsWith(String.valueOf(s))) {
                             participants.add(participant);
                         }
                     }
@@ -113,11 +119,6 @@ public class EventActivity extends AppCompatActivity {
 
                 if (fabScan.getVisibility() != View.VISIBLE)
                     fabScan.show();
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-
             }
         });
     }

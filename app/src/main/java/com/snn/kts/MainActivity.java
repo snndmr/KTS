@@ -31,6 +31,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -41,36 +42,27 @@ public class MainActivity extends AppCompatActivity {
     private ShimmerFrameLayout shimmerFrameLayout;
     private DatabaseReference databaseEventReference;
 
-    /*private void createTestVal() {
-        for (int i = 0; i < 10; i++) {
-            ArrayList<Participant> participants = new ArrayList<>();
-            for (int j = 0; j < 20; j++) {
-                participants.add(new Participant(
-                        String.valueOf(System.currentTimeMillis()) + j,
-                        "participant " + j + " : " + i,
-                        "participant " + j + " : " + i + "@ybu.edu.tr",
-                        "555 " + i + "23" + j + "4 " + i));
+    /*void createTestValues() {
+        String[] events = getResources().getStringArray(R.array.events);
+        String[] students = getResources().getStringArray(R.array.students);
+        String[] participants = getResources().getStringArray(R.array.participants);
+
+
+        for (String event : events) {
+            ArrayList<Participant> participantsList = new ArrayList<>();
+
+            for (int j = 0; j < ThreadLocalRandom.current().nextInt(100, 500); j++) {
+                String[] temp = students[j].split(",");
+                participantsList.add(new Student(temp[0], temp[1], temp[2], temp[3], temp[4], temp[5]));
             }
 
-            for (int j = 0; j < 30; j++) {
-                participants.add(new Student(
-                        String.valueOf(System.currentTimeMillis()) + j,
-                        "student " + j + " : " + i,
-                        "student " + j + " : " + i + "@ybu.edu.tr",
-                        "555 " + i + "23" + j + "4 " + i,
-                        "Computer Engineering" + j,
-                        "555 " + i + "23" + j + "4 " + i));
+            for (int j = 0; j < ThreadLocalRandom.current().nextInt(100, 500); j++) {
+                String[] temp = participants[j].split(",");
+                participantsList.add(new Participant(temp[0], temp[1], temp[2], temp[3]));
             }
 
-            Event event = new Event(
-                    String.valueOf(System.currentTimeMillis()) + i,
-                    "event " + i,
-                    i % 31 + "/" + i % 12 + "/2020",
-                    i % 24 + ":" + i,
-                    "Ayvalı, Gazze Cd. No:7, 06010 Keçiören/Ankara",
-                    "Kariyer Günleri " + i,
-                    participants);
-            createEvent(event);
+            String[] temp = event.split(",");
+            createEvent(new Event(temp[0], temp[1], temp[2], temp[3], temp[4], temp[5], participantsList));
         }
     }*/
 
@@ -79,9 +71,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
         initComponents();
-        //createTestVal();
         readEvents();
+        /*createTestValues();*/
     }
 
     private void initComponents() {
